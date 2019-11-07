@@ -34,14 +34,29 @@ public class jeu {
 	/**
 	 * Correspond à la taille du plateau (qui est un carré de taille x taille)
 	 * 0 : case vide
-	 * 1 : Joueur 1 (correspond au pion "O")
-	 * 2 : Joueur 2 (correspond au pion "X")
+	 * 1 : Joueur 1 (correspond au pion "X")
+	 * 2 : Joueur 2 (correspond au pion "O")
 	 */
 	public static int taille;
 	public static int[][] plateau; // Contient les pions
 	public static boolean passe; // Indique si le joueur précédent à passé son tour.
 
 
+	/**
+	 * Vérifie qu'un tableau d'entier contient un numéro
+	 * 
+	 * @param tab le tableau dans lequelle on fait la recherche
+	 * @param num le numéro recherché dans le tableau
+	 * @return true s'il le contient, false sinon
+	 */
+	public static boolean tableauContient(int[] tab, int num) {
+		for (int i = 0; i < tab.length; ++i) {
+			if (tab[i] == num)
+				return true;
+		}
+
+		return false;
+	}
 	
 	/************************ Partie 1 ************************/
 	/**
@@ -50,12 +65,14 @@ public class jeu {
 	 * @param regle
 	 * @return retourn false si la taille en sortie n'est pas un nombre paire (rendant le jeu impossible)
 	 */
-	public static boolean init(int taille, boolean regle)  {
+	public static boolean init(int taillePlateau, boolean regle)  {
 		// Si la taille est impaire on retourne false
 		if (taille % 2 != 0)
 			return false;
 
 		// Initialisation des variables simples
+		taille = taillePlateau;
+		plateau = new int[taille][taille];
 		joueur = 1;
 		passe = false;
 
@@ -64,17 +81,18 @@ public class jeu {
 		// Initialisation du plateau
 		for (int y = 0; y < taille; ++y) {
 			for (int x = 0; x < taille; ++x) {
+				plateau[x][y] = 0;
 				// La partie haute du milieu du plateau
 				if (x == (milieu - 1) && y == (milieu - 1))
-					plateau[x][y] = 2; // On met "X"
+					plateau[x][y] = 1; // On met "X"
 				if (x == milieu && y == (milieu - 1))
-					plateau[x][y] = 1; // On met "O"
+					plateau[x][y] = 2; // On met "O"
 
 				// La partie basse du milieu du plateau
 				if (x == (milieu - 1) && y == milieu)
-					plateau[x][y] = regle ? 2 : 1; // Si regle est "true" on met "X" sinon on met "O"
+					plateau[x][y] = regle ? 1 : 2; // Si regle est "true" on met "X" sinon on met "O"
 				if (x == milieu && y == milieu) 
-					plateau[x][y] = regle ? 1 : 2; // Si regle est "true" on met "O" sinon on met "X"
+					plateau[x][y] = regle ? 2 : 1; // Si regle est "true" on met "O" sinon on met "X"
 			}
 		}
 
@@ -124,7 +142,7 @@ public class jeu {
 	 * @return le numéro de case
 	 */
 	public static int conversion2D1D(int ligne, int colonne) {
-		return ligne * taille + colonne;
+		return colonne * taille + ligne;
 	}
 
 	/**
@@ -151,6 +169,37 @@ public class jeu {
 		return numero - ligne * taille;
 	}
 
+	/**
+	 * Affiche le plateau en surlignant des cases données dans un tableau
+	 * @param casesSurlignees les numéros des cases à surligner
+	 */
+	public static void affiche(int[] casesSurlignees) {
+		// On dessine les lettres
+		System.out.print("   |");
+		for (int x = 0; x < taille; ++x) {
+			System.out.print((char)(65 + x) + "|");
+		}
+		System.out.println();
+
+		// On dessine les lignes
+		for (int y = 0; y < taille; ++y) {
+			// D'abord le numéro de ligne
+			System.out.print(String.format("%03d", y) + "|");
+			for (int x = 0; x < taille; ++x) {
+				if (plateau[x][y] == 1) 
+					System.out.print("X");
+				else if (plateau[x][y] == 2)
+					System.out.print("O");
+				else if (tableauContient(casesSurlignees, conversion2D1D(x, y)))
+					System.out.print("#");
+				else 
+					System.out.print(" ");
+
+				System.out.print("|");
+			}
+			System.out.println();
+		}
+	}
 
 	/************************ Partie 2 ************************/
 	
@@ -169,7 +218,9 @@ public class jeu {
 	
 	/*************************** main ***************************/
 	public static void main(String[] args) {
-	
+		init(8, false);
+		int[] caseSurLigne = {0,3,13};
+		affiche(caseSurLigne);
 	}
 
 }

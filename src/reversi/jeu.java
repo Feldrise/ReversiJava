@@ -1,5 +1,32 @@
 package reversi;
 
+///////////////////////////////////////////////
+//////////// NOTE DE MODELISATION ////////////
+///////////////////////////////////////////////
+//
+//
+// Modélisation de plateau 6 x 6
+//
+// 0 0 0 0 0 0  
+// 0 0 0 0 0 0  
+// 0 0 X - 0 0  
+// 0 0 - X 0 0  
+// 0 0 0 0 0 0  
+// 0 0 0 0 0 0  
+//
+//
+// Modélisation de la linéarisation
+//
+// 00 01 02 03 04 05
+// 06 07 08 09 10 11
+// 12 13 14 15 16 17
+// 18 19 20 21 22 23
+// 24 25 26 27 28 29
+// 30 31 32 33 34 35
+//				   
+// Linéarisation de 09 >>> 9 = (1, 3) : 1 * 6 + 3
+// Formule générale    >>> n = (x, y) : x * taille + y
+
 public class jeu {
 	
 	//variables globales
@@ -19,9 +46,8 @@ public class jeu {
 	/************************ Partie 1 ************************/
 	/**
 	 * Cette fonction initialise le jeu
-	 * @param taille
+	 * @param taille 
 	 * @param regle
-	 * 
 	 * @return retourn false si la taille en sortie n'est pas un nombre paire (rendant le jeu impossible)
 	 */
 	public static boolean init(int taille, boolean regle)  {
@@ -55,7 +81,51 @@ public class jeu {
 		// Notre jeu a bien été initialisé
 		return true;
 	}
-	
+
+	/**
+	 * Vérifie que les corrdonnées appartiennent au plateaux.
+	 * 
+	 * @param i correspond au x sur le plateau
+	 * @param j correspond au y sur le plateau
+	 * @return true si les coordonnées sont sur le plateau, retourn false sinon
+	 */
+	public static boolean caseCorrecte(int i, int j) {
+		return (i >= 0 && i < taille) || (j >= 0 && j < taille);
+	}
+
+	/**
+	 * Vérifie que le numéro de case est valide
+	 * @param i numéro de la case
+	 * @return true sur le numéro est sur le plateau, false si il ne l'est pas
+	 */	
+	public static boolean caseCorrecte(int i){
+		int nbreCase = taille * taille;
+
+		if (i >= nbreCase)
+			return false;
+		
+		return true;
+	}
+
+	/**
+	 * Conversion de coordonnées en numéro de case
+	 * 00 01 02 03 04 05
+	 * 06 07 08 09 10 11
+	 * 12 13 14 15 16 17
+	 * 18 19 20 21 22 23
+	 * 24 25 26 27 28 29
+	 * 30 31 32 33 34 35
+	 * 				
+	 * Linéarisation de 09 >>> 9 = (1, 3) : 1 * 6 + 3
+	 * Formule générale    >>> n = (x, y) : x * taille + y
+	 * 
+	 * @param ligne coordonée x
+	 * @param colonne coordonée y
+	 * @return le numéro de case
+	 */
+	public static int conversion2D1D(int ligne, int colonne) {
+		return ligne * taille + colonne;
+	}
 
 
 	/************************ Partie 2 ************************/

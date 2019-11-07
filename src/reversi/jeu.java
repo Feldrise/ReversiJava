@@ -127,6 +127,30 @@ public class jeu {
 		return ligne * taille + colonne;
 	}
 
+	/**
+	 * Retourne la ligne correspondant à un numéro de case
+	 * @param numero 
+	 * @return le numéro de la ligne
+	 */
+	public static int conversion1DLigne(int numero) {
+		return numero / taille;
+	}
+
+	/**
+	 * Forumule pour trouver la colonne sachant qu'on connait n, x (numéro / taille) et t
+	 * n = x * t + y
+	 * n - x * t = y
+	 * 
+	 * Récupère le numéro de colonne d'un numéro de case
+	 * @param numero
+	 * @return le numéro de la colonne
+	 */
+	public static int conversion1DColonne(int numero) {
+		int ligne = numero / taille;
+
+		return numero - ligne * taille;
+	}
+
 
 	/************************ Partie 2 ************************/
 	

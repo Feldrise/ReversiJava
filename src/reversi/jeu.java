@@ -87,7 +87,7 @@ public class jeu {
 	 */
 	public static boolean init(int taillePlateau, boolean regle)  {
 		// Si la taille est impaire on retourne false
-		if (taille % 2 != 0)
+		if (taillePlateau % 2 != 0)
 			return false;
 
 		// Initialisation des variables simples
@@ -283,6 +283,13 @@ public class jeu {
 		}
 
 		return sauvegardePlateau;
+	}
+
+	public static void charge(int[][] newPlateau, int newJoueur, boolean newPasse) {
+		plateau = newPlateau;
+		taille = newPlateau[0].length;
+		joueur = newJoueur;
+		passe = newPasse;
 	}
 
 	/************************ Partie 2 ************************/

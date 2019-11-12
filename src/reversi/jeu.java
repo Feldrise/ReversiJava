@@ -57,6 +57,26 @@ public class jeu {
 
 		return false;
 	}
+
+	/**
+	 * Retourne le score d'un joueur, c'est à dire le nombre de ses pièces présentes sur le plateau
+	 * 
+	 * @param joueur
+	 * @return le score du joueur
+	 */
+	public static int scoreJoueur(int joueur) {
+		int score = 0;
+
+		for (int y = 0; y < plateau.length; ++y) {
+			for (int x = 0; x < plateau.length; ++x) {
+				if (plateau[x][y] == joueur) 
+					++score;
+			}
+		}
+
+		return score;
+
+	}
 	
 	/************************ Partie 1 ************************/
 	/**
@@ -174,6 +194,8 @@ public class jeu {
 	 * @param casesSurlignees les numéros des cases à surligner
 	 */
 	public static void affiche(int[] casesSurlignees) {
+		System.out.println();
+
 		// On dessine les lettres
 		System.out.print("   |");
 		for (int x = 0; x < taille; ++x) {
@@ -199,6 +221,51 @@ public class jeu {
 			}
 			System.out.println();
 		}
+
+		System.out.println();
+		
+	}
+
+	/**
+	 * Affiche le plateau sans surligner de  case
+	 */
+	public static void affiche() {
+		int[] surligne = new int[0];
+
+		affiche(surligne);
+	}
+
+	/**
+	 * Affiche les scores des joueurs
+	 * 
+	 * @return 0 si les deux joueurs sont à égalité, 1 si le joueur 1 domine, 2 si le joueur 2 domine
+	 */
+	public static int score() {
+		// On calcule le score
+		int scoreJoueur1 = scoreJoueur(1);
+		int scoreJoueur2 = scoreJoueur(2);
+
+		// On affiche le score
+		System.out.println("====== SCORES ======");
+		System.out.println("Joueur 1 : " + scoreJoueur1 + " pion" + (scoreJoueur1 > 1 ? "s" : ""));
+		System.out.println("Joueur 2 : " + scoreJoueur2 + " pion" + (scoreJoueur2 > 1 ? "s" : ""));
+		System.out.println();
+
+		if (scoreJoueur1 > scoreJoueur2) {
+			System.out.println("Le joueur 1 à l'avantage");
+			System.out.println("====================");
+			return 1;
+		}
+		
+		if (scoreJoueur2 > scoreJoueur1) {
+			System.out.println("Le joueur 2 à l'avantage");
+			System.out.println("====================");
+			return 2;
+		}
+
+		System.out.println("Les deux joueurs sont à égalité.");
+		System.out.println("====================");
+		return 0;
 	}
 
 	/************************ Partie 2 ************************/
@@ -220,7 +287,8 @@ public class jeu {
 	public static void main(String[] args) {
 		init(8, false);
 		int[] caseSurLigne = {0,3,13};
-		affiche(caseSurLigne);
+		affiche();
+		score();
 	}
 
 }

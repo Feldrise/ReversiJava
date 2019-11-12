@@ -285,11 +285,14 @@ public class jeu {
 		return sauvegardePlateau;
 	}
 
-	public static void charge(int[][] newPlateau, int newJoueur, boolean newPasse) {
-		plateau = newPlateau;
-		taille = newPlateau[0].length;
-		joueur = newJoueur;
-		passe = newPasse;
+	/**
+	 * Replace les variables globales par celle-ci
+	 */
+	public static void charge(int[][] nouvPlateau, int nouvJoueur, boolean nouvPasse) {
+		plateau = nouvPlateau;
+		taille = nouvPlateau[0].length;
+		joueur = nouvJoueur;
+		passe = nouvPasse;
 	}
 
 	/************************ Partie 2 ************************/

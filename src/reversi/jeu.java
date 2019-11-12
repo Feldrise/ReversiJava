@@ -75,7 +75,10 @@ public class jeu {
 		}
 
 		return score;
+	}
 
+	public static int lettreVersNombre(char lettre) {
+		return (int)(lettre) - 65;
 	}
 	
 	/************************ Partie 1 ************************/
@@ -128,7 +131,7 @@ public class jeu {
 	 * @return true si les coordonnées sont sur le plateau, retourn false sinon
 	 */
 	public static boolean caseCorrecte(int i, int j) {
-		return (i >= 0 && i < taille) || (j >= 0 && j < taille);
+		return (i >= 0 && i < taille) && (j >= 0 && j < taille);
 	}
 
 	/**
@@ -297,6 +300,42 @@ public class jeu {
 
 	/************************ Partie 2 ************************/
 	
+	/**
+	 * Vérifie que le format d'un string est valide, c'est à dire qu'il correspond à une case du plateau.
+	 * Par exemple, 25A peut correspondre à une case, mais pas B2T
+	 * 
+	 * @param input
+	 * @return true si valide, false si invalide
+	 */
+	public static boolean verifierFormat(String input) {
+		int nombre = -1;
+		String lettre = "";
+		
+		// On extrait le nombre et la lettre
+		int i = 0;
+		do {
+			// On vérifie que tout le mot est un nombre. Sinon, on essai sur le mot moins 
+			// le dernier caractère, sinon on enlève encore le caractère d'avant, etc.
+			try {
+				nombre = Integer.parseInt(input.substring(0, input.length() - i)); 
+				lettre = input.substring(input.length() - i, input.length()); // Un fois qu'on à le nombre, on peut déduire la suite
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			++i;
+		} while (nombre == -1 && i < input.length());
+
+		// Si on a pas trouvé de nombre ou que la lettre n'est pas juste une lettre, c'est d'office invalide.
+		if (nombre < 0 || lettre.length() > 1)
+			return false;
+
+		if (caseCorrecte(nombre, lettreVersNombre(lettre.charAt(0))))
+			return true;
+
+		return false;
+	}
 
 
 
@@ -316,6 +355,10 @@ public class jeu {
 		int[] caseSurLigne = {0,3,13};
 		affiche();
 		score();
+
+		System.out.println(verifierFormat("8I") ? "Le format est valide" : "Le format est invalide");
+
+		// System.out.println(lettreVersNombre('A'));
 	}
 
 }

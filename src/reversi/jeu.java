@@ -366,7 +366,7 @@ public class jeu {
 				lettre = input.substring(input.length() - i, input.length()); // Un fois qu'on à le nombre, on peut déduire la suite
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 			}
 
 			++i;
@@ -554,7 +554,7 @@ public class jeu {
 		affiche();
 		score();
 
-		System.out.println(verifierFormat("8I") ? "Le format est valide" : "Le format est invalide");
+		System.out.println(verifierFormat("7H") ? "Le format est valide" : "Le format est invalide");
 
 		// System.out.println(lettreVersNombre('A'));
 	}

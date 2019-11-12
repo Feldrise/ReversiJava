@@ -15,6 +15,15 @@ package reversi;
 // 0 0 0 0 0 0  
 //
 //
+//
+// 0 0 0 0 0 0  
+// 0 0 0 0 0 0  
+// 0 0 X - 0 0  
+// 0 0 - X 0 0  
+// 0 0 0 0 0 0  
+// 0 0 0 0 0 0  
+//
+//
 // Modélisation de la linéarisation
 //
 // 00 01 02 03 04 05
@@ -299,7 +308,7 @@ public class jeu {
 	}
 
 	/************************ Partie 2 ************************/
-	
+
 	/**
 	 * Vérifie que le format d'un string est valide, c'est à dire qu'il correspond à une case du plateau.
 	 * Par exemple, 25A peut correspondre à une case, mais pas B2T
@@ -337,7 +346,196 @@ public class jeu {
 		return false;
 	}
 
+	/**
+	 * Convertie une chaine de caractère en un numéro de case
+	 * 
+	 * @param input la chaine à convertir
+	 * @return le numéro de case
+	 */
+	public static int conversionChaineNumero(String input) {
+		int nombre = -1;
+		String lettre = "";
+		
+		// On extrait le nombre et la lettre
+		int i = 0;
+		do {
+			// On vérifie que tout le mot est un nombre. Sinon, on essai sur le mot moins 
+			// le dernier caractère, sinon on enlève encore le caractère d'avant, etc.
+			try {
+				nombre = Integer.parseInt(input.substring(0, input.length() - i)); 
+				lettre = input.substring(input.length() - i, input.length()); // Un fois qu'on à le nombre, on peut déduire la suite
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
 
+			++i;
+		} while (nombre == -1 && i < input.length());
+
+		return conversion2D1D(nombre, lettreVersNombre(lettre.charAt(0)));
+	}
+
+	/**
+	 * Vérifie qu'une case contient une pièce
+	 */
+	public static boolean contientPiece(int numero) {
+		int valeurCase = plateau[conversion1DColonne(numero)][conversion1DLigne(numero)];
+
+		return valeurCase == 1 || valeurCase == 2;
+	}
+
+	/**
+	 * Echange la valeur d'une piece vers l'oposé
+	 * 
+	 * @param numero de la pièce à retourner
+	 */
+	public static void retournePiece(int numero) {
+		if (contientPiece(numero)) {
+			switch (plateau[conversion1DColonne(numero)][conversion1DLigne(numero)]) {
+			case 1:
+				plateau[conversion1DColonne(numero)][conversion1DLigne(numero)] = 2;
+				break;
+			case 2:
+				plateau[conversion1DColonne(numero)][conversion1DLigne(numero)] = 1;
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Permet de savoir tous les coups possibles dans une direction
+	 * 
+	 * @param joueur qui joue (on cherche donc à retourner les opposés)
+	 * @param numero case de départ
+	 * @param direction direction de jeu
+	 * @return toutes les pièces pouvant être retournées
+	 */
+	public static int[] retourneDir(int joueur, int numero, String direction) {
+		int[] coupsPossibles = new int[taille];
+		int nombreDeCoups = 0;
+		int joueurOppose = (joueur == 1) ? 2 : 1;
+
+		int i = 0;
+		int y = 0;
+		int x = 0;
+
+		// En direction du nord
+		if (direction == "N" && conversion1DLigne(numero) > 0) {
+			x = conversion1DColonne(numero);
+			y = conversion1DLigne(numero) - 1;
+
+			while (plateau[x][y] == joueurOppose && y >= 0) {
+				coupsPossibles[i] = conversion2D1D(x, y);
+				++nombreDeCoups;
+				++i;
+				--y;
+			}
+		}
+		
+		// En direction de l'est
+		if (direction == "E" && conversion1DColonne(numero) < taille - 1) {
+			x = conversion1DColonne(numero) + 1;
+			y = conversion1DLigne(numero);
+
+			while (plateau[x][y] == joueurOppose && x < taille) {
+				coupsPossibles[i] = conversion2D1D(x, y);
+				++nombreDeCoups;
+				++i;
+				++x;
+			}
+		}
+
+		// En direction du sud
+		if (direction == "S" && conversion1DLigne(numero) < taille - 1) {
+			x = conversion1DColonne(numero);
+			y = conversion1DLigne(numero) + 1;
+
+			while (plateau[x][y] == joueurOppose && y < taille) {
+				coupsPossibles[i] = conversion2D1D(x, y);
+				++nombreDeCoups;
+				++i;
+				++y;
+			}
+		}
+
+		// En direction de l'ouest
+		if (direction == "O" && conversion1DColonne(numero) > 0) {
+			x = conversion1DColonne(numero) - 1;
+			y = conversion1DLigne(numero);
+
+			while (plateau[x][y] == joueurOppose && x >= 0) {
+				coupsPossibles[i] = conversion2D1D(x, y);
+				++nombreDeCoups;
+				++i;
+				--x;
+			}
+		}
+
+		// En direction du nord ouest
+		if (direction == "NO" && conversion1DColonne(numero) > 0 && conversion1DLigne(numero) > 0) {
+			x = conversion1DColonne(numero) - 1;
+			y = conversion1DLigne(numero) - 1;
+
+			while (plateau[x][y] == joueurOppose && x >= 0 && y >= 0) {
+				coupsPossibles[i] = conversion2D1D(x, y);
+				++nombreDeCoups;
+				++i;
+				--x;
+				--y;
+			}
+		}
+
+		// En direction du nord est
+		if (direction == "NE" && conversion1DColonne(numero) < taille - 1 && conversion1DLigne(numero) > 0) {
+			x = conversion1DColonne(numero) + 1;
+			y = conversion1DLigne(numero) - 1;
+
+			while (plateau[x][y] == joueurOppose && x < taille && y >= 0) {
+				coupsPossibles[i] = conversion2D1D(x, y);
+				++nombreDeCoups;
+				++i;
+				++x;
+				--y;
+			}
+		}
+
+		// En direction du sud est
+		if (direction == "SE" && conversion1DColonne(numero) < taille - 1 && conversion1DLigne(numero) < taille - 1) {
+			x = conversion1DColonne(numero) + 1;
+			y = conversion1DLigne(numero) + 1;
+
+			while (plateau[x][y] == joueurOppose && x < taille && y < taille) {
+				coupsPossibles[i] = conversion2D1D(x, y);
+				++nombreDeCoups;
+				++i;
+				++x;
+				++y;
+			}
+		}
+
+		// En direction du sud est
+		if (direction == "SO" && conversion1DColonne(numero) > 0 && conversion1DLigne(numero) < taille - 1) {
+			x = conversion1DColonne(numero) - 1;
+			y = conversion1DLigne(numero) + 1;
+
+			while (plateau[x][y] == joueurOppose && x >= 0 && y < taille) {
+				coupsPossibles[i] = conversion2D1D(x, y);
+				++nombreDeCoups;
+				++i;
+				--x;
+				++y;
+			}
+		}
+
+		int[] result = new int[nombreDeCoups];
+		for (int j = 0; j < nombreDeCoups; ++j) {
+			result[j] = coupsPossibles[j];
+		}
+
+		return result;
+	}
 
 	/************************ Partie 3 ************************/
 	

@@ -223,7 +223,7 @@ public class jeu {
 		}
 
 		System.out.println();
-		
+
 	}
 
 	/**
@@ -266,6 +266,23 @@ public class jeu {
 		System.out.println("Les deux joueurs sont à égalité.");
 		System.out.println("====================");
 		return 0;
+	}
+
+	/**
+	 * Créer une copie du plateau
+	 * 
+	 * @return une copie du plateau
+	 */
+	public static int[][] sauvegarde() {
+		int[][] sauvegardePlateau = new int[taille][taille];
+
+		for (int y = 0; y < taille; ++y) {
+			for (int x = 0; x < taille; ++x) {
+				sauvegardePlateau[x][y] = plateau[x][y];
+			}
+		}
+
+		return sauvegardePlateau;
 	}
 
 	/************************ Partie 2 ************************/

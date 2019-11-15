@@ -1,5 +1,7 @@
 package reversi;
 
+import java.util.*;
+
 ///////////////////////////////////////////////
 //////////// NOTE DE MODELISATION ////////////
 ///////////////////////////////////////////////
@@ -537,6 +539,163 @@ public class jeu {
 		return result;
 	}
 
+	/**
+	 * 0 0 0 0 0 0 
+	 * 0 0 - X 0 0    7 
+	 * X X X X 0 0   14 | 14 - (taille + 1)
+	 * 0 0 - X 0 0 
+	 * 0 0 0 0 0 0 
+	 * 0 0 0 0 0 0 
+	 * 
+	 * Cette fonction permet de verifier ET obtenir le coup possible dans une direction donnée
+	 * 
+	 * @param depart la case pour laquelle on veut verifier le coup possible
+	 * @param joueurOppose le joueur oppose à celui qui joue
+	 * @param tailleTest permet de savoir si on cherche sur la même ligne (taill = 0), la ligne au dessus (taille négative) ou en dessous (taille positive)
+	 * @param offset permet de savoir si on cherche à gauche (-1), au même niveau (0) ou a droite (1)
+	 *  
+	 * @return un tableau de deux int : le premier indiquant un coup possible (0 ou 1) et le second indiquand le numéro du coup possible s'il y en a un
+	 */
+	public static int[] coupsPossibleDansDir(int depart, int joueurOppose, int tailleTest, int offset) {
+		boolean joueurPresent = false;
+		boolean videPresent = false;
+		int coupPossible = 0;
+		for (coupPossible = depart + (tailleTest + offset); (conversion1DColonne(coupPossible) >= 0) || (conversion1DLigne(coupPossible) >= 0); coupPossible += (tailleTest + offset)) {
+			if (plateau[conversion1DColonne(coupPossible)][conversion1DLigne(coupPossible)] == joueur)
+				break;
+
+			if (plateau[conversion1DColonne(coupPossible)][conversion1DLigne(coupPossible)] == joueurOppose) {
+				joueurPresent = true;
+				continue;
+			}
+
+			if (!contientPiece(coupPossible)) {
+				videPresent = true;
+				break;
+			}
+		}
+
+		int[] result = new int[2];
+
+		if (joueurPresent && videPresent) {
+			result[0] = 1;
+			result[1] = coupPossible;
+		}
+		else {
+			result[0] = 0;
+			result[1] = 0;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Cette fonction permet d'obtenir tous les coup possibles pour le joueur actif
+	 * 
+	 * @return le numéro des coups possible
+	 */
+	public static int[]  possibleCoups() {
+		int joueurOppose = (joueur == 1) ? 2 : 1;
+
+		int[] coups = new int[taille * taille];
+		int nbreCoupsPossible = 0;
+
+		for (int i = 0; i < taille * taille; ++i) {
+			if (plateau[conversion1DColonne(i)][conversion1DLigne(i)] == joueur) {
+				int checkX = conversion1DColonne(i);
+				int checkY = conversion1DLigne(i);
+
+				// Nord Ouest
+				if (checkX > 0 && checkY > 0) {
+					int[] result = coupsPossibleDansDir(i, joueurOppose, -taille, -1);
+
+					if (result[0] == 1) {
+						coups[nbreCoupsPossible] = result[1];
+						++nbreCoupsPossible;
+					}
+				}
+
+				// Nord
+				if (checkX > 0) {
+					int[] result = coupsPossibleDansDir(i, joueurOppose, -taille, 0);
+
+					if (result[0] == 1) {
+						coups[nbreCoupsPossible] = result[1];
+						++nbreCoupsPossible;
+					}
+				}
+
+				// Nord Est
+				if (checkX < taille - 1 && checkY > 0) {
+					int[] result = coupsPossibleDansDir(i, joueurOppose, -taille, 1);
+
+					if (result[0] == 1) {
+						coups[nbreCoupsPossible] = result[1];
+						++nbreCoupsPossible;
+					}
+				}
+
+				// Ouest
+				if (checkY > 0) {
+					int[] result = coupsPossibleDansDir(i, joueurOppose, 0, -1);
+
+					if (result[0] == 1) {
+						coups[nbreCoupsPossible] = result[1];
+						++nbreCoupsPossible;
+					}
+				}
+
+				// Est
+				if (checkY < taille - 1) {
+					int[] result = coupsPossibleDansDir(i, joueurOppose, 0, 1);
+
+					if (result[0] == 1) {
+						coups[nbreCoupsPossible] = result[1];
+						++nbreCoupsPossible;
+					}
+				}
+
+				// Sud Ouest
+				if (checkX < taille - 1 && checkY > 0) {
+					int[] result = coupsPossibleDansDir(i, joueurOppose, taille, -1);
+
+					if (result[0] == 1) {
+						coups[nbreCoupsPossible] = result[1];
+						++nbreCoupsPossible;
+					}
+				}
+
+				// Sud
+				if (checkX < taille - 1) {
+					int[] result = coupsPossibleDansDir(i, joueurOppose, taille, 0);
+
+					if (result[0] == 1) {
+						coups[nbreCoupsPossible] = result[1];
+						++nbreCoupsPossible;
+					}
+				}
+
+				// Sud Est
+				if (checkX < taille - 1 && checkY < taille - 1) {
+					int[] result = coupsPossibleDansDir(i, joueurOppose, taille, 1);
+
+					if (result[0] == 1) {
+						coups[nbreCoupsPossible] = result[1];
+						++nbreCoupsPossible;
+					}
+				}
+
+			}
+		}
+
+		int[] result = new int[nbreCoupsPossible];
+		for (int i = 0; i < nbreCoupsPossible; ++i) {
+			result[i] = coups[i];
+		}
+
+		return result;
+	}
+
 	/************************ Partie 3 ************************/
 	
 
@@ -549,13 +708,29 @@ public class jeu {
 	
 	/*************************** main ***************************/
 	public static void main(String[] args) {
-		init(8, false);
+		init(6, false);
+
+		// 0 0 0 0 0 0 
+		// 0 0 - X 0 0   
+		// X X X X 0 0   
+		// 0 0 - X 0 0 
+		// 0 0 0 0 0 0 
+		// 0 0 0 0 0 0 
+		plateau = new int[][] { 
+			{0, 0, 1, 0, 0, 0 },
+			{0, 0, 1, 0, 0, 0 },
+			{0, 2, 1, 2, 0, 0 },
+			{0, 1, 1, 1, 0, 0 },
+			{0, 0, 0, 0, 0, 0 },
+			{0, 0, 0, 0, 0, 0 },
+		};
+
+		joueur = 2;
+
 		int[] caseSurLigne = {0,3,13};
 		affiche();
 		score();
-
-		System.out.println(verifierFormat("7H") ? "Le format est valide" : "Le format est invalide");
-
+		affiche(possibleCoups());
 		// System.out.println(lettreVersNombre('A'));
 	}
 

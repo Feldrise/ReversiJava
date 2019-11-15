@@ -747,6 +747,15 @@ public class jeu {
 
 	}
 
+	/**
+	 * Permet de voir les coups possibles pour un joueur
+	 * 
+	 * @param version ? 
+	 */
+	public static void aide(int version) {
+		affiche(possibleCoups());
+	}
+
 	/************************ Partie 3 ************************/
 	
 
@@ -781,7 +790,7 @@ public class jeu {
 		int[] caseSurLigne = {0,3,13};
 		affiche();
 		score();
-		affiche(possibleCoups());
+		aide(1);
 		joueCoup(2);
 		affiche();
 		// System.out.println(lettreVersNombre('A'));

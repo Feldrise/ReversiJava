@@ -92,6 +92,23 @@ public class jeu {
 		return (int)(lettre) - 65;
 	}
 	
+	/**
+	 * Permet d'inverser des cases
+	 * 
+	 * @param numeros les numéros des cases à inverser
+	 */
+	public static void inverseCases(int[] numeros) {
+		for (int i = 0; i < numeros.length; ++i) {
+			int current = plateau[conversion1DColonne(numeros[i])][conversion1DLigne(numeros[i])];
+			
+			if (current == 1)
+				plateau[conversion1DColonne(numeros[i])][conversion1DLigne(numeros[i])] = 2;
+
+			if (current == 2)
+				plateau[conversion1DColonne(numeros[i])][conversion1DLigne(numeros[i])] = 1;
+		}
+	}
+
 	/************************ Partie 1 ************************/
 	/**
 	 * Cette fonction initialise le jeu
@@ -696,6 +713,40 @@ public class jeu {
 		return result;
 	}
 
+	/**
+	 * Joue le coup
+	 * 
+	 * @param numero la case ou le pion est placé
+	 * @return true si le coup est valide, false sinon
+	 */
+	public static boolean joueCoup(int numero) {
+		if (!tableauContient(possibleCoups(), numero))
+			return false;
+
+		int[] coupsNordsOuest = retourneDir(joueur, numero, "NO");
+		int[] coupsNords = retourneDir(joueur, numero, "N");
+		int[] coupsNordsEst = retourneDir(joueur, numero, "NE");
+		int[] coupsOuest = retourneDir(joueur, numero, "O");
+		int[] coupsEst = retourneDir(joueur, numero, "E");
+		int[] coupsSudOuest = retourneDir(joueur, numero, "SO");
+		int[] coupsSud = retourneDir(joueur, numero, "S");
+		int[] coupsSudEst = retourneDir(joueur, numero, "SE");
+
+		inverseCases(coupsNordsOuest);
+		inverseCases(coupsNords);
+		inverseCases(coupsNordsEst);
+		inverseCases(coupsOuest);
+		inverseCases(coupsEst);
+		inverseCases(coupsSudOuest);
+		inverseCases(coupsSud);
+		inverseCases(coupsSudEst);
+
+		plateau[conversion1DColonne(numero)][conversion1DLigne(numero)] = joueur;
+
+		return true;
+
+	}
+
 	/************************ Partie 3 ************************/
 	
 
@@ -725,12 +776,14 @@ public class jeu {
 			{0, 0, 0, 0, 0, 0 },
 		};
 
-		joueur = 2;
+		joueur = 1;
 
 		int[] caseSurLigne = {0,3,13};
 		affiche();
 		score();
 		affiche(possibleCoups());
+		joueCoup(2);
+		affiche();
 		// System.out.println(lettreVersNombre('A'));
 	}
 

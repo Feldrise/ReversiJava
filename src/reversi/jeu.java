@@ -41,6 +41,8 @@ import java.util.*;
 public class jeu {
 	
 	//variables globales
+	public static Scanner sc; // Le scanner utilisé pour récupérer les entrés joueurs
+
 	public static int joueur; // Correspond au numéro du joueur jouant le tour
 	/**
 	 * Correspond à la taille du plateau (qui est un carré de taille x taille)
@@ -192,8 +194,8 @@ public class jeu {
 	 * @param colonne coordonée y
 	 * @return le numéro de case
 	 */
-	public static int conversion2D1D(int ligne, int colonne) {
-		return colonne * taille + ligne;
+	public static int conversion2D1D(int x, int y) {
+		return y * taille + x;
 	}
 
 	/**
@@ -391,7 +393,7 @@ public class jeu {
 			++i;
 		} while (nombre == -1 && i < input.length());
 
-		return conversion2D1D(nombre, lettreVersNombre(lettre.charAt(0)));
+		return conversion2D1D(lettreVersNombre(lettre.charAt(0)), nombre);
 	}
 
 	/**
@@ -451,6 +453,11 @@ public class jeu {
 				++i;
 				--y;
 			}
+
+			// On vérifie que cette direction était valide
+			if (y < 0 || plateau[x][y] != joueur) {
+				coupsPossibles = new int[taille];
+			}
 		}
 		
 		// En direction de l'est
@@ -463,6 +470,11 @@ public class jeu {
 				++nombreDeCoups;
 				++i;
 				++x;
+			}
+
+			// On vérifie que cette direction était valide
+			if (x >= taille || plateau[x][y] != joueur) {
+				coupsPossibles = new int[taille];
 			}
 		}
 
@@ -477,6 +489,11 @@ public class jeu {
 				++i;
 				++y;
 			}
+
+			// On vérifie que cette direction était valide
+			if (y >= taille || plateau[x][y] != joueur) {
+				coupsPossibles = new int[taille];
+			}
 		}
 
 		// En direction de l'ouest
@@ -489,6 +506,10 @@ public class jeu {
 				++nombreDeCoups;
 				++i;
 				--x;
+			}
+
+			if (x < 0 || plateau[x][y] != joueur) {
+				coupsPossibles = new int[taille];
 			}
 		}
 
@@ -504,6 +525,11 @@ public class jeu {
 				--x;
 				--y;
 			}
+
+			// On vérifie que cette direction était valide
+			if (y < 0 || x < 0 || plateau[x][y] != joueur) {
+				coupsPossibles = new int[taille];
+			}
 		}
 
 		// En direction du nord est
@@ -517,6 +543,11 @@ public class jeu {
 				++i;
 				++x;
 				--y;
+			}
+
+			// On vérifie que cette direction était valide
+			if (y < 0 || x >= taille || plateau[x][y] != joueur) {
+				coupsPossibles = new int[taille];
 			}
 		}
 
@@ -532,6 +563,11 @@ public class jeu {
 				++x;
 				++y;
 			}
+
+			// On vérifie que cette direction était valide
+			if (y >= taille || x >= taille || plateau[x][y] != joueur) {
+				coupsPossibles = new int[taille];
+			}
 		}
 
 		// En direction du sud est
@@ -545,6 +581,11 @@ public class jeu {
 				++i;
 				--x;
 				++y;
+			}
+
+			// On vérifie que cette direction était valide
+			if (y >= taille || x < 0 || plateau[x][y] != joueur) {
+				coupsPossibles = new int[taille];
 			}
 		}
 
@@ -578,6 +619,11 @@ public class jeu {
 		boolean videPresent = false;
 		int coupPossible = 0;
 		for (coupPossible = depart + (tailleTest + offset); (conversion1DColonne(coupPossible) >= 0) || (conversion1DLigne(coupPossible) >= 0); coupPossible += (tailleTest + offset)) {
+			if (coupPossible < 0 || coupPossible >= taille * taille) {
+				videPresent = true;
+				break;
+			}
+
 			if (plateau[conversion1DColonne(coupPossible)][conversion1DLigne(coupPossible)] == joueur)
 				break;
 
@@ -757,7 +803,105 @@ public class jeu {
 	}
 
 	/************************ Partie 3 ************************/
-	
+	public static void attendre() {
+		System.out.println("Appuyer sur entré pour continuer...");
+		sc.nextLine();
+	}
+
+	public static void ecranSuivant() {
+		for (int i = 0; i < 25; ++i) 
+			System.out.println();
+	}
+
+	public static String menuEnJeu() {
+		System.out.println("Que voulez vous faire avant votre tour ?");
+		System.out.println("(save, help, exit ou none)");
+		
+		return sc.nextLine();
+	}
+
+	public static void jeuBoucle(boolean regle) {
+		boolean joueur1PeutJouer = true;
+		boolean joueur2PeutJouer = true;
+
+		while (joueur1PeutJouer && joueur2PeutJouer) {
+			ecranSuivant();
+
+			int[] coupsPossible = possibleCoups();
+
+			// On affiche ce qu'il y a à afficher
+			System.out.println("====================");
+			System.out.println();
+			affiche();
+			System.out.println("Le joueur " + (joueur == 1 ? "1" : "2") + " à la main.");
+			System.out.println();
+			score();
+			
+			// On affiche le menu de sauvegarde
+			String menuEnJeu = menuEnJeu();
+			// sc.nextLine(); // Fix pour ne pas avoir de nextLine ignoré
+
+			switch (menuEnJeu) {
+			case "save":
+				sauvegarde();
+				break;
+			case "help":
+				aide(1);
+				break;
+			case "exit":
+				return;
+			case "none":
+				break; 
+			default:
+				System.out.println("Cette option n'existe pas. Le jeu continue.");
+			}
+			
+			// On vérifie que le joueur peut jouer et on met à jour les variables en fonctions
+			if (coupsPossible.length < 1) {
+				if (joueur == 1) 
+					joueur1PeutJouer = false;
+				else 
+					joueur2PeutJouer = false;
+
+				continue;
+			}
+			else {
+				if (joueur == 1) 
+					joueur1PeutJouer = true;
+				else 
+					joueur2PeutJouer = true;
+			}
+
+			// La, on est sur que le joueur peut jouer
+			if (regle) {
+				System.out.println("Voulze vous passer votre tour (Y/n) ?");
+				String reponse = sc.nextLine();
+				
+				if (reponse.toLowerCase() == "Y") {
+					if (joueur == 1) 
+						joueur1PeutJouer = false;
+					else 
+						joueur2PeutJouer = false;
+					
+					continue;
+				}
+			}
+
+			System.out.println("Veuillez indiquer la case que vous voulez jouer");
+			boolean coupValide = false;
+
+			while (!coupValide) {
+				System.out.println("Choisissez le coup que vous voulez faire.");
+				System.out.println("Vérifiez bien le format et sa possibilité, le coup vous sera demandé tant qu'il n'est pas valide");
+				
+				String coup = sc.nextLine();
+
+				coupValide = verifierFormat(coup) && joueCoup(conversionChaineNumero(coup));
+			}
+
+			joueur = (joueur == 1) ? 2 : 1;
+		}
+	}
 
 
 	
@@ -768,31 +912,35 @@ public class jeu {
 	
 	/*************************** main ***************************/
 	public static void main(String[] args) {
+		sc = new Scanner(System.in);
+
 		init(6, false);
 
-		// 0 0 0 0 0 0 
-		// 0 0 - X 0 0   
-		// X X X X 0 0   
-		// 0 0 - X 0 0 
-		// 0 0 0 0 0 0 
-		// 0 0 0 0 0 0 
-		plateau = new int[][] { 
-			{0, 0, 1, 0, 0, 0 },
-			{0, 0, 1, 0, 0, 0 },
-			{0, 2, 1, 2, 0, 0 },
-			{0, 1, 1, 1, 0, 0 },
-			{0, 0, 0, 0, 0, 0 },
-			{0, 0, 0, 0, 0, 0 },
-		};
+		jeuBoucle(false);
 
-		joueur = 1;
+		// // 0 0 0 0 0 0 
+		// // 0 0 - X 0 0   
+		// // X X X X 0 0   
+		// // 0 0 - X 0 0 
+		// // 0 0 0 0 0 0 
+		// // 0 0 0 0 0 0 
+		// plateau = new int[][] { 
+		// 	{0, 0, 1, 0, 0, 0 },
+		// 	{0, 0, 1, 0, 0, 0 },
+		// 	{0, 2, 1, 2, 0, 0 },
+		// 	{0, 1, 1, 1, 0, 0 },
+		// 	{0, 0, 0, 0, 0, 0 },
+		// 	{0, 0, 0, 0, 0, 0 },
+		// };
 
-		int[] caseSurLigne = {0,3,13};
-		affiche();
-		score();
-		aide(1);
-		joueCoup(2);
-		affiche();
+		// joueur = 1;
+
+		// int[] caseSurLigne = {0,3,13};
+		// affiche();
+		// score();
+		// aide(1);
+		// joueCoup(2);
+		// affiche();
 		// System.out.println(lettreVersNombre('A'));
 	}
 

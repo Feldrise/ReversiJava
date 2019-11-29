@@ -80,9 +80,9 @@ public class jeu {
 	public static int scoreJoueur(int joueur) {
 		int score = 0;
 
-		for (int y = 0; y < plateau.length; ++y) {
-			for (int x = 0; x < plateau.length; ++x) {
-				if (plateau[x][y] == joueur) 
+		for (int ligne = 0; ligne < plateau.length; ++ligne) {
+			for (int colonne = 0; colonne < plateau.length; ++colonne) {
+				if (plateau[ligne][colonne] == joueur) 
 					++score;
 			}
 		}
@@ -101,13 +101,13 @@ public class jeu {
 	 */
 	public static void inverseCases(int[] numeros) {
 		for (int i = 0; i < numeros.length; ++i) {
-			int current = plateau[conversion1DColonne(numeros[i])][conversion1DLigne(numeros[i])];
+			int current = plateau[conversion1DLigne(numeros[i])][conversion1DColonne(numeros[i])];
 			
 			if (current == 1)
-				plateau[conversion1DColonne(numeros[i])][conversion1DLigne(numeros[i])] = 2;
+				plateau[conversion1DLigne(numeros[i])][conversion1DColonne(numeros[i])] = 2;
 
 			if (current == 2)
-				plateau[conversion1DColonne(numeros[i])][conversion1DLigne(numeros[i])] = 1;
+				plateau[conversion1DLigne(numeros[i])][conversion1DColonne(numeros[i])] = 1;
 		}
 	}
 
@@ -132,20 +132,20 @@ public class jeu {
 		// On commence par calculer le millieu pour savoir ou placer les premiers pions
 		int milieu = taille / 2;
 		// Initialisation du plateau
-		for (int y = 0; y < taille; ++y) {
-			for (int x = 0; x < taille; ++x) {
-				plateau[x][y] = 0;
+		for (int ligne = 0; ligne < taille; ++ligne) {
+			for (int colonne = 0; colonne < taille; ++colonne) {
+				plateau[ligne][colonne] = 0;
 				// La partie haute du milieu du plateau
-				if (x == (milieu - 1) && y == (milieu - 1))
-					plateau[x][y] = 1; // On met "X"
-				if (x == milieu && y == (milieu - 1))
-					plateau[x][y] = 2; // On met "O"
+				if (ligne == milieu - 1 && colonne == milieu - 1)
+					plateau[ligne][colonne] = 1; // On met "X"
+				if (ligne == milieu - 1 && colonne == milieu)
+					plateau[ligne][colonne] = 2; // On met "O"
 
 				// La partie basse du milieu du plateau
-				if (x == (milieu - 1) && y == milieu)
-					plateau[x][y] = regle ? 1 : 2; // Si regle est "true" on met "X" sinon on met "O"
-				if (x == milieu && y == milieu) 
-					plateau[x][y] = regle ? 2 : 1; // Si regle est "true" on met "O" sinon on met "X"
+				if (ligne == milieu && colonne == milieu - 1)
+					plateau[ligne][colonne] = regle ? 1 : 2; // Si regle est "true" on met "X" sinon on met "O"
+				if (ligne == milieu && colonne == milieu) 
+					plateau[ligne][colonne] = regle ? 2 : 1; // Si regle est "true" on met "O" sinon on met "X"
 			}
 		}
 
@@ -156,12 +156,12 @@ public class jeu {
 	/**
 	 * Vérifie que les corrdonnées appartiennent au plateaux.
 	 * 
-	 * @param i correspond au x sur le plateau
-	 * @param j correspond au y sur le plateau
+	 * @param ligne correspond au y sur le plateau
+	 * @param colonne correspond au x sur le plateau
 	 * @return true si les coordonnées sont sur le plateau, retourn false sinon
 	 */
-	public static boolean caseCorrecte(int i, int j) {
-		return (i >= 0 && i < taille) && (j >= 0 && j < taille);
+	public static boolean caseCorrecte(int ligne, int colonne) {
+		return (ligne >= 0 && ligne < taille) && (colonne >= 0 && colonne < taille);
 	}
 
 	/**
@@ -194,8 +194,8 @@ public class jeu {
 	 * @param colonne coordonée y
 	 * @return le numéro de case
 	 */
-	public static int conversion2D1D(int x, int y) {
-		return y * taille + x;
+	public static int conversion2D1D(int ligne, int colonne) {
+		return ligne * taille + colonne;
 	}
 
 	/**
@@ -231,21 +231,21 @@ public class jeu {
 
 		// On dessine les lettres
 		System.out.print("   |");
-		for (int x = 0; x < taille; ++x) {
-			System.out.print((char)(65 + x) + "|");
+		for (int colonne = 0; colonne < taille; ++colonne) {
+			System.out.print((char)(65 + colonne) + "|");
 		}
 		System.out.println();
 
 		// On dessine les lignes
-		for (int y = 0; y < taille; ++y) {
+		for (int ligne = 0; ligne < taille; ++ligne) {
 			// D'abord le numéro de ligne
-			System.out.print(String.format("%03d", y) + "|");
-			for (int x = 0; x < taille; ++x) {
-				if (plateau[x][y] == 1) 
+			System.out.print(String.format("%03d", ligne) + "|");
+			for (int colonne = 0; colonne < taille; ++colonne) {
+				if (plateau[ligne][colonne] == 1) 
 					System.out.print("X");
-				else if (plateau[x][y] == 2)
+				else if (plateau[ligne][colonne] == 2)
 					System.out.print("O");
-				else if (tableauContient(casesSurlignees, conversion2D1D(x, y)))
+				else if (tableauContient(casesSurlignees, conversion2D1D(ligne, colonne)))
 					System.out.print("#");
 				else 
 					System.out.print(" ");
@@ -309,9 +309,9 @@ public class jeu {
 	public static int[][] sauvegarde() {
 		int[][] sauvegardePlateau = new int[taille][taille];
 
-		for (int y = 0; y < taille; ++y) {
-			for (int x = 0; x < taille; ++x) {
-				sauvegardePlateau[x][y] = plateau[x][y];
+		for (int ligne = 0; ligne < taille; ++ligne) {
+			for (int colonne = 0; colonne < taille; ++colonne) {
+				sauvegardePlateau[ligne][colonne] = plateau[ligne][colonne];
 			}
 		}
 
@@ -393,14 +393,14 @@ public class jeu {
 			++i;
 		} while (nombre == -1 && i < input.length());
 
-		return conversion2D1D(lettreVersNombre(lettre.charAt(0)), nombre);
+		return conversion2D1D(nombre, lettreVersNombre(lettre.charAt(0)));
 	}
 
 	/**
 	 * Vérifie qu'une case contient une pièce
 	 */
 	public static boolean contientPiece(int numero) {
-		int valeurCase = plateau[conversion1DColonne(numero)][conversion1DLigne(numero)];
+		int valeurCase = plateau[conversion1DLigne(numero)][conversion1DColonne(numero)];
 
 		return valeurCase == 1 || valeurCase == 2;
 	}
@@ -412,12 +412,12 @@ public class jeu {
 	 */
 	public static void retournePiece(int numero) {
 		if (contientPiece(numero)) {
-			switch (plateau[conversion1DColonne(numero)][conversion1DLigne(numero)]) {
+			switch (plateau[conversion1DLigne(numero)][conversion1DColonne(numero)]) {
 			case 1:
-				plateau[conversion1DColonne(numero)][conversion1DLigne(numero)] = 2;
+				plateau[conversion1DLigne(numero)][conversion1DColonne(numero)] = 2;
 				break;
 			case 2:
-				plateau[conversion1DColonne(numero)][conversion1DLigne(numero)] = 1;
+				plateau[conversion1DLigne(numero)][conversion1DColonne(numero)] = 1;
 				break;
 			default:
 				break;
@@ -439,152 +439,152 @@ public class jeu {
 		int joueurOppose = (joueur == 1) ? 2 : 1;
 
 		int i = 0;
-		int y = 0;
-		int x = 0;
+		int ligne = 0;
+		int colonne = 0;
 
 		// En direction du nord
-		if (direction == "N" && conversion1DLigne(numero) > 0) {
-			x = conversion1DColonne(numero);
-			y = conversion1DLigne(numero) - 1;
+		if (direction == "N" && conversion1DLigne(numero) >= 0) {
+			ligne = conversion1DLigne(numero) - 1;
+			colonne = conversion1DColonne(numero);
 
-			while (plateau[x][y] == joueurOppose && y >= 0) {
-				coupsPossibles[i] = conversion2D1D(x, y);
+			while (ligne >= 0 && plateau[ligne][colonne] == joueurOppose) {
+				coupsPossibles[i] = conversion2D1D(ligne, colonne);
 				++nombreDeCoups;
 				++i;
-				--y;
+				--ligne;
 			}
 
 			// On vérifie que cette direction était valide
-			if (y < 0 || plateau[x][y] != joueur) {
+			if (ligne < 0 || plateau[ligne][colonne] != joueur) {
 				coupsPossibles = new int[taille];
 			}
 		}
 		
 		// En direction de l'est
-		if (direction == "E" && conversion1DColonne(numero) < taille - 1) {
-			x = conversion1DColonne(numero) + 1;
-			y = conversion1DLigne(numero);
+		if (direction == "E" && conversion1DColonne(numero) < taille) {
+			ligne = conversion1DLigne(numero);
+			colonne = conversion1DColonne(numero) + 1;
 
-			while (plateau[x][y] == joueurOppose && x < taille) {
-				coupsPossibles[i] = conversion2D1D(x, y);
+			while (colonne < taille && plateau[ligne][colonne] == joueurOppose) {
+				coupsPossibles[i] = conversion2D1D(ligne, colonne);
 				++nombreDeCoups;
 				++i;
-				++x;
+				++colonne;
 			}
 
 			// On vérifie que cette direction était valide
-			if (x >= taille || plateau[x][y] != joueur) {
+			if (colonne >= taille || plateau[ligne][colonne] != joueur) {
 				coupsPossibles = new int[taille];
 			}
 		}
 
 		// En direction du sud
-		if (direction == "S" && conversion1DLigne(numero) < taille - 1) {
-			x = conversion1DColonne(numero);
-			y = conversion1DLigne(numero) + 1;
+		if (direction == "S" && conversion1DLigne(numero) < taille) {
+			ligne = conversion1DLigne(numero) + 1;
+			colonne = conversion1DColonne(numero);
 
-			while (plateau[x][y] == joueurOppose && y < taille) {
-				coupsPossibles[i] = conversion2D1D(x, y);
+			while (ligne < taille && plateau[ligne][colonne] == joueurOppose) {
+				coupsPossibles[i] = conversion2D1D(ligne, colonne);
 				++nombreDeCoups;
 				++i;
-				++y;
+				++ligne;
 			}
 
 			// On vérifie que cette direction était valide
-			if (y >= taille || plateau[x][y] != joueur) {
+			if (ligne >= taille || plateau[ligne][colonne] != joueur) {
 				coupsPossibles = new int[taille];
 			}
 		}
 
 		// En direction de l'ouest
-		if (direction == "O" && conversion1DColonne(numero) > 0) {
-			x = conversion1DColonne(numero) - 1;
-			y = conversion1DLigne(numero);
+		if (direction == "O" && conversion1DColonne(numero) >= 0) {
+			ligne = conversion1DLigne(numero);
+			colonne = conversion1DColonne(numero) - 1;
 
-			while (plateau[x][y] == joueurOppose && x >= 0) {
-				coupsPossibles[i] = conversion2D1D(x, y);
+			while (colonne >= 0 && plateau[ligne][colonne] == joueurOppose) {
+				coupsPossibles[i] = conversion2D1D(ligne, colonne);
 				++nombreDeCoups;
 				++i;
-				--x;
+				--colonne;
 			}
 
-			if (x < 0 || plateau[x][y] != joueur) {
+			if (colonne < 0 || plateau[ligne][colonne] != joueur) {
 				coupsPossibles = new int[taille];
 			}
 		}
 
 		// En direction du nord ouest
-		if (direction == "NO" && conversion1DColonne(numero) > 0 && conversion1DLigne(numero) > 0) {
-			x = conversion1DColonne(numero) - 1;
-			y = conversion1DLigne(numero) - 1;
+		if (direction == "NO" && conversion1DLigne(numero) >= 0 && conversion1DColonne(numero) >= 0) {
+			ligne = conversion1DLigne(numero) - 1;
+			colonne = conversion1DColonne(numero) - 1;
 
-			while (plateau[x][y] == joueurOppose && x >= 0 && y >= 0) {
-				coupsPossibles[i] = conversion2D1D(x, y);
+			while (ligne >= 0 && colonne >= 0 && plateau[ligne][colonne] == joueurOppose) {
+				coupsPossibles[i] = conversion2D1D(ligne, colonne);
 				++nombreDeCoups;
 				++i;
-				--x;
-				--y;
+				--ligne;
+				--colonne;
 			}
 
 			// On vérifie que cette direction était valide
-			if (y < 0 || x < 0 || plateau[x][y] != joueur) {
+			if (ligne < 0 || colonne < 0 || plateau[ligne][colonne] != joueur) {
 				coupsPossibles = new int[taille];
 			}
 		}
 
 		// En direction du nord est
-		if (direction == "NE" && conversion1DColonne(numero) < taille - 1 && conversion1DLigne(numero) > 0) {
-			x = conversion1DColonne(numero) + 1;
-			y = conversion1DLigne(numero) - 1;
+		if (direction == "NE" && conversion1DLigne(numero) >= 0 && conversion1DColonne(numero) < taille) {
+			ligne = conversion1DLigne(numero) - 1;
+			colonne = conversion1DColonne(numero) + 1;
 
-			while (plateau[x][y] == joueurOppose && x < taille && y >= 0) {
-				coupsPossibles[i] = conversion2D1D(x, y);
+			while (ligne >= 0 && colonne < taille && plateau[ligne][colonne] == joueurOppose ) {
+				coupsPossibles[i] = conversion2D1D(ligne, colonne);
 				++nombreDeCoups;
 				++i;
-				++x;
-				--y;
+				--ligne;
+				++colonne;
 			}
 
 			// On vérifie que cette direction était valide
-			if (y < 0 || x >= taille || plateau[x][y] != joueur) {
+			if (ligne < 0 || colonne >= taille || plateau[ligne][colonne] != joueur) {
 				coupsPossibles = new int[taille];
 			}
 		}
 
 		// En direction du sud est
-		if (direction == "SE" && conversion1DColonne(numero) < taille - 1 && conversion1DLigne(numero) < taille - 1) {
-			x = conversion1DColonne(numero) + 1;
-			y = conversion1DLigne(numero) + 1;
+		if (direction == "SE" && conversion1DLigne(numero) < taille && conversion1DColonne(numero) < taille) {
+			ligne = conversion1DLigne(numero) + 1;
+			colonne = conversion1DColonne(numero) + 1;
 
-			while (plateau[x][y] == joueurOppose && x < taille && y < taille) {
-				coupsPossibles[i] = conversion2D1D(x, y);
+			while (ligne < taille && colonne < taille && plateau[ligne][colonne] == joueurOppose) {
+				coupsPossibles[i] = conversion2D1D(ligne, colonne);
 				++nombreDeCoups;
 				++i;
-				++x;
-				++y;
+				++ligne;
+				++colonne;
 			}
 
 			// On vérifie que cette direction était valide
-			if (y >= taille || x >= taille || plateau[x][y] != joueur) {
+			if (ligne >= taille || colonne >= taille || plateau[ligne][colonne] != joueur) {
 				coupsPossibles = new int[taille];
 			}
 		}
 
 		// En direction du sud est
-		if (direction == "SO" && conversion1DColonne(numero) > 0 && conversion1DLigne(numero) < taille - 1) {
-			x = conversion1DColonne(numero) - 1;
-			y = conversion1DLigne(numero) + 1;
+		if (direction == "SO" && conversion1DLigne(numero) < taille && conversion1DColonne(numero) >= 0) {
+			ligne = conversion1DLigne(numero) + 1;
+			colonne = conversion1DColonne(numero) - 1;
 
-			while (plateau[x][y] == joueurOppose && x >= 0 && y < taille) {
-				coupsPossibles[i] = conversion2D1D(x, y);
+			while (ligne < taille && colonne >= 0 && plateau[ligne][colonne] == joueurOppose) {
+				coupsPossibles[i] = conversion2D1D(ligne, colonne);
 				++nombreDeCoups;
 				++i;
-				--x;
-				++y;
+				++ligne;
+				--colonne;
 			}
 
 			// On vérifie que cette direction était valide
-			if (y >= taille || x < 0 || plateau[x][y] != joueur) {
+			if (ligne >= taille || colonne < 0 || plateau[ligne][colonne] != joueur) {
 				coupsPossibles = new int[taille];
 			}
 		}
@@ -618,16 +618,14 @@ public class jeu {
 		boolean joueurPresent = false;
 		boolean videPresent = false;
 		int coupPossible = 0;
-		for (coupPossible = depart + (tailleTest + offset); (conversion1DColonne(coupPossible) >= 0) || (conversion1DLigne(coupPossible) >= 0); coupPossible += (tailleTest + offset)) {
-			if (coupPossible < 0 || coupPossible >= taille * taille) {
-				videPresent = true;
-				break;
-			}
-
-			if (plateau[conversion1DColonne(coupPossible)][conversion1DLigne(coupPossible)] == joueur)
+		for (coupPossible = depart + (tailleTest + offset); (conversion1DLigne(coupPossible) >= 0) && (conversion1DColonne(coupPossible) >= 0) && (conversion1DLigne(coupPossible) < taille) && (conversion1DColonne(coupPossible) < taille); coupPossible += (tailleTest + offset)) {
+			if ((offset == -1 && conversion1DColonne(coupPossible) >= conversion1DColonne(depart)) || (offset == 1 && conversion1DColonne(coupPossible) <= conversion1DColonne(depart))) // Lorsqu'on va sur le côté ET haut/bas
 				break;
 
-			if (plateau[conversion1DColonne(coupPossible)][conversion1DLigne(coupPossible)] == joueurOppose) {
+			if (plateau[conversion1DLigne(coupPossible)][conversion1DColonne(coupPossible)] == joueur)
+				break;
+
+			if (plateau[conversion1DLigne(coupPossible)][conversion1DColonne(coupPossible)] == joueurOppose) {
 				joueurPresent = true;
 				continue;
 			}
@@ -664,12 +662,12 @@ public class jeu {
 		int nbreCoupsPossible = 0;
 
 		for (int i = 0; i < taille * taille; ++i) {
-			if (plateau[conversion1DColonne(i)][conversion1DLigne(i)] == joueur) {
-				int checkX = conversion1DColonne(i);
-				int checkY = conversion1DLigne(i);
+			if (plateau[conversion1DLigne(i)][conversion1DColonne(i)] == joueur) {
+				int checkLigne = conversion1DLigne(i);
+				int checkColonne = conversion1DColonne(i);
 
 				// Nord Ouest
-				if (checkX > 0 && checkY > 0) {
+				if (checkLigne > 0 && checkColonne > 0) {
 					int[] result = coupsPossibleDansDir(i, joueurOppose, -taille, -1);
 
 					if (result[0] == 1) {
@@ -679,7 +677,7 @@ public class jeu {
 				}
 
 				// Nord
-				if (checkX > 0) {
+				if (checkLigne > 0) {
 					int[] result = coupsPossibleDansDir(i, joueurOppose, -taille, 0);
 
 					if (result[0] == 1) {
@@ -689,7 +687,7 @@ public class jeu {
 				}
 
 				// Nord Est
-				if (checkX < taille - 1 && checkY > 0) {
+				if (checkLigne > 0 && checkColonne < taille - 1) {
 					int[] result = coupsPossibleDansDir(i, joueurOppose, -taille, 1);
 
 					if (result[0] == 1) {
@@ -699,7 +697,7 @@ public class jeu {
 				}
 
 				// Ouest
-				if (checkY > 0) {
+				if (checkColonne > 0) {
 					int[] result = coupsPossibleDansDir(i, joueurOppose, 0, -1);
 
 					if (result[0] == 1) {
@@ -709,7 +707,7 @@ public class jeu {
 				}
 
 				// Est
-				if (checkY < taille - 1) {
+				if (checkColonne < taille - 1) {
 					int[] result = coupsPossibleDansDir(i, joueurOppose, 0, 1);
 
 					if (result[0] == 1) {
@@ -719,7 +717,7 @@ public class jeu {
 				}
 
 				// Sud Ouest
-				if (checkX < taille - 1 && checkY > 0) {
+				if (checkLigne < taille - 1 && checkColonne > 0) {
 					int[] result = coupsPossibleDansDir(i, joueurOppose, taille, -1);
 
 					if (result[0] == 1) {
@@ -729,7 +727,7 @@ public class jeu {
 				}
 
 				// Sud
-				if (checkX < taille - 1) {
+				if (checkLigne < taille - 1) {
 					int[] result = coupsPossibleDansDir(i, joueurOppose, taille, 0);
 
 					if (result[0] == 1) {
@@ -739,7 +737,7 @@ public class jeu {
 				}
 
 				// Sud Est
-				if (checkX < taille - 1 && checkY < taille - 1) {
+				if (checkLigne < taille - 1 && checkColonne < taille - 1) {
 					int[] result = coupsPossibleDansDir(i, joueurOppose, taille, 1);
 
 					if (result[0] == 1) {
@@ -787,7 +785,7 @@ public class jeu {
 		inverseCases(coupsSud);
 		inverseCases(coupsSudEst);
 
-		plateau[conversion1DColonne(numero)][conversion1DLigne(numero)] = joueur;
+		plateau[conversion1DLigne(numero)][conversion1DColonne(numero)] = joueur;
 
 		return true;
 
@@ -874,7 +872,7 @@ public class jeu {
 
 			// La, on est sur que le joueur peut jouer
 			if (regle) {
-				System.out.println("Voulze vous passer votre tour (Y/n) ?");
+				System.out.println("Voulez vous passer votre tour (Y/n) ?");
 				String reponse = sc.nextLine();
 				
 				if (reponse.toLowerCase() == "Y") {
@@ -936,7 +934,7 @@ public class jeu {
 		// joueur = 1;
 
 		// int[] caseSurLigne = {0,3,13};
-		// affiche();
+		// affiche(caseSurLigne);
 		// score();
 		// aide(1);
 		// joueCoup(2);

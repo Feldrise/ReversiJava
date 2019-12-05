@@ -190,8 +190,8 @@ public class jeu {
 	 * Linéarisation de 09 >>> 9 = (1, 3) : 1 * 6 + 3
 	 * Formule générale    >>> n = (x, y) : x * taille + y
 	 * 
-	 * @param ligne coordonée x
-	 * @param colonne coordonée y
+	 * @param ligne coordonée y
+	 * @param colonne coordonée x
 	 * @return le numéro de case
 	 */
 	public static int conversion2D1D(int ligne, int colonne) {
@@ -426,6 +426,47 @@ public class jeu {
 	}
 
 	/**
+	 * Donne tous les pions retournés dans une direction indiqué par les différents offset
+	 * 
+	 * @param numero numéro de la case testé
+	 * @param joueurOppose numéro du joueur opposé 
+	 * @param verticalOffset indique la direction verticale
+	 * @param horizontalOffset indique la direction horizontale
+	 * 
+	 * @return un tableau avec tous les coups possibles
+	 */
+	public static int[] pionsRetournes(int numero, int joueurOppose, int verticalOffset, int horizontalOffset) {
+		int i = 0;
+		int nbreCoupsPossible = 0;
+		int[] coupsPossibles = new int[taille];
+
+		int ligne = conversion1DLigne(numero) + verticalOffset;
+		int colonne = conversion1DColonne(numero) + horizontalOffset;
+
+		while (ligne >= 0 && ligne < taille && colonne >= 0 && colonne < taille && plateau[ligne][colonne] == joueurOppose) { // Temps que la case est sur le plateay 
+			coupsPossibles[i] = conversion2D1D(ligne, colonne);
+			ligne += verticalOffset;
+			colonne += horizontalOffset;
+			++nbreCoupsPossible;
+			++i;
+		}
+
+		// Si on à retourné une direction qui n'est pas un coup valide, on ne retourne rien
+		if (ligne < 0 || ligne >= taille || colonne < 0 || colonne >= taille || plateau[ligne][colonne] != joueur) {
+			coupsPossibles = new int[taille];
+			nbreCoupsPossible = 0;
+		}
+
+		// On retourne un tableau contenant uniquement les coups possibles et pas de case "vide"
+		int[] result = new int[nbreCoupsPossible];
+		for (int j = 0; j < nbreCoupsPossible; ++j) {
+			result[j] = coupsPossibles[j];
+		}
+
+		return result;
+	}
+
+	/**
 	 * Permet de savoir tous les coups possibles dans une direction
 	 * 
 	 * @param joueur qui joue (on cherche donc à retourner les opposés)
@@ -434,167 +475,39 @@ public class jeu {
 	 * @return toutes les pièces pouvant être retournées
 	 */
 	public static int[] retourneDir(int joueur, int numero, String direction) {
-		int[] coupsPossibles = new int[taille];
-		int nombreDeCoups = 0;
+		int[] coupsPossibles = {};
 		int joueurOppose = (joueur == 1) ? 2 : 1;
 
-		int i = 0;
-		int ligne = 0;
-		int colonne = 0;
-
-		// En direction du nord
-		if (direction == "N" && conversion1DLigne(numero) >= 0) {
-			ligne = conversion1DLigne(numero) - 1;
-			colonne = conversion1DColonne(numero);
-
-			while (ligne >= 0 && plateau[ligne][colonne] == joueurOppose) {
-				coupsPossibles[i] = conversion2D1D(ligne, colonne);
-				++nombreDeCoups;
-				++i;
-				--ligne;
-			}
-
-			// On vérifie que cette direction était valide
-			if (ligne < 0 || plateau[ligne][colonne] != joueur) {
-				coupsPossibles = new int[taille];
-			}
-		}
+		// On utilise les offset :
+		// - verticalement : -1 va vers le nord et 1 vers le sud
+		// - horizontalement : -1 va vers l'ouest et 1 vers l'est
 		
+		// En direction du nord
+		if (direction == "N" && conversion1DLigne(numero) >= 0) 
+			coupsPossibles = pionsRetournes(numero, joueurOppose, -1, 0);
 		// En direction de l'est
-		if (direction == "E" && conversion1DColonne(numero) < taille) {
-			ligne = conversion1DLigne(numero);
-			colonne = conversion1DColonne(numero) + 1;
-
-			while (colonne < taille && plateau[ligne][colonne] == joueurOppose) {
-				coupsPossibles[i] = conversion2D1D(ligne, colonne);
-				++nombreDeCoups;
-				++i;
-				++colonne;
-			}
-
-			// On vérifie que cette direction était valide
-			if (colonne >= taille || plateau[ligne][colonne] != joueur) {
-				coupsPossibles = new int[taille];
-			}
-		}
-
+		if (direction == "E" && conversion1DColonne(numero) < taille) 
+			coupsPossibles = pionsRetournes(numero, joueurOppose, 0, 1);
 		// En direction du sud
-		if (direction == "S" && conversion1DLigne(numero) < taille) {
-			ligne = conversion1DLigne(numero) + 1;
-			colonne = conversion1DColonne(numero);
-
-			while (ligne < taille && plateau[ligne][colonne] == joueurOppose) {
-				coupsPossibles[i] = conversion2D1D(ligne, colonne);
-				++nombreDeCoups;
-				++i;
-				++ligne;
-			}
-
-			// On vérifie que cette direction était valide
-			if (ligne >= taille || plateau[ligne][colonne] != joueur) {
-				coupsPossibles = new int[taille];
-			}
-		}
-
+		if (direction == "S" && conversion1DLigne(numero) < taille) 
+			coupsPossibles = pionsRetournes(numero, joueurOppose, 1, 0);
 		// En direction de l'ouest
-		if (direction == "O" && conversion1DColonne(numero) >= 0) {
-			ligne = conversion1DLigne(numero);
-			colonne = conversion1DColonne(numero) - 1;
-
-			while (colonne >= 0 && plateau[ligne][colonne] == joueurOppose) {
-				coupsPossibles[i] = conversion2D1D(ligne, colonne);
-				++nombreDeCoups;
-				++i;
-				--colonne;
-			}
-
-			if (colonne < 0 || plateau[ligne][colonne] != joueur) {
-				coupsPossibles = new int[taille];
-			}
-		}
-
+		if (direction == "O" && conversion1DColonne(numero) >= 0) 
+			coupsPossibles = pionsRetournes(numero, joueurOppose, 0, -1);
 		// En direction du nord ouest
-		if (direction == "NO" && conversion1DLigne(numero) >= 0 && conversion1DColonne(numero) >= 0) {
-			ligne = conversion1DLigne(numero) - 1;
-			colonne = conversion1DColonne(numero) - 1;
-
-			while (ligne >= 0 && colonne >= 0 && plateau[ligne][colonne] == joueurOppose) {
-				coupsPossibles[i] = conversion2D1D(ligne, colonne);
-				++nombreDeCoups;
-				++i;
-				--ligne;
-				--colonne;
-			}
-
-			// On vérifie que cette direction était valide
-			if (ligne < 0 || colonne < 0 || plateau[ligne][colonne] != joueur) {
-				coupsPossibles = new int[taille];
-			}
-		}
-
+		if (direction == "NO" && conversion1DLigne(numero) >= 0 && conversion1DColonne(numero) >= 0) 
+			coupsPossibles = pionsRetournes(numero, joueurOppose, -1, -1);
 		// En direction du nord est
-		if (direction == "NE" && conversion1DLigne(numero) >= 0 && conversion1DColonne(numero) < taille) {
-			ligne = conversion1DLigne(numero) - 1;
-			colonne = conversion1DColonne(numero) + 1;
-
-			while (ligne >= 0 && colonne < taille && plateau[ligne][colonne] == joueurOppose ) {
-				coupsPossibles[i] = conversion2D1D(ligne, colonne);
-				++nombreDeCoups;
-				++i;
-				--ligne;
-				++colonne;
-			}
-
-			// On vérifie que cette direction était valide
-			if (ligne < 0 || colonne >= taille || plateau[ligne][colonne] != joueur) {
-				coupsPossibles = new int[taille];
-			}
-		}
-
+		if (direction == "NE" && conversion1DLigne(numero) >= 0 && conversion1DColonne(numero) < taille) 
+			coupsPossibles = pionsRetournes(numero, joueurOppose, -1, 1);
 		// En direction du sud est
-		if (direction == "SE" && conversion1DLigne(numero) < taille && conversion1DColonne(numero) < taille) {
-			ligne = conversion1DLigne(numero) + 1;
-			colonne = conversion1DColonne(numero) + 1;
-
-			while (ligne < taille && colonne < taille && plateau[ligne][colonne] == joueurOppose) {
-				coupsPossibles[i] = conversion2D1D(ligne, colonne);
-				++nombreDeCoups;
-				++i;
-				++ligne;
-				++colonne;
-			}
-
-			// On vérifie que cette direction était valide
-			if (ligne >= taille || colonne >= taille || plateau[ligne][colonne] != joueur) {
-				coupsPossibles = new int[taille];
-			}
-		}
-
+		if (direction == "SE" && conversion1DLigne(numero) < taille && conversion1DColonne(numero) < taille)
+			coupsPossibles = pionsRetournes(numero, joueurOppose, 1, 1);
 		// En direction du sud est
-		if (direction == "SO" && conversion1DLigne(numero) < taille && conversion1DColonne(numero) >= 0) {
-			ligne = conversion1DLigne(numero) + 1;
-			colonne = conversion1DColonne(numero) - 1;
+		if (direction == "SO" && conversion1DLigne(numero) < taille && conversion1DColonne(numero) >= 0) 
+			coupsPossibles = pionsRetournes(numero, joueurOppose, 1, -1);
 
-			while (ligne < taille && colonne >= 0 && plateau[ligne][colonne] == joueurOppose) {
-				coupsPossibles[i] = conversion2D1D(ligne, colonne);
-				++nombreDeCoups;
-				++i;
-				++ligne;
-				--colonne;
-			}
-
-			// On vérifie que cette direction était valide
-			if (ligne >= taille || colonne < 0 || plateau[ligne][colonne] != joueur) {
-				coupsPossibles = new int[taille];
-			}
-		}
-
-		int[] result = new int[nombreDeCoups];
-		for (int j = 0; j < nombreDeCoups; ++j) {
-			result[j] = coupsPossibles[j];
-		}
-
-		return result;
+		return coupsPossibles;
 	}
 
 	/**
@@ -801,11 +714,17 @@ public class jeu {
 	}
 
 	/************************ Partie 3 ************************/
+	/**
+	 * Permet d'attendre que le joueur appuis sur une touche du clavier pour continuer
+	 */
 	public static void attendre() {
 		System.out.println("Appuyer sur entré pour continuer...");
 		sc.nextLine();
 	}
 
+	/**
+	 * Dessine de nombreuses ligne pour donner l'impression qu'on passe à un nouvel écran de console
+	 */
 	public static void ecranSuivant() {
 		for (int i = 0; i < 25; ++i) 
 			System.out.println();
@@ -818,6 +737,11 @@ public class jeu {
 		return sc.nextLine();
 	}
 
+	/**
+	 * Boule du jeu
+	 * 
+	 * @param regle la règle avec laquelle on joue
+	 */
 	public static void jeuBoucle(boolean regle) {
 		boolean joueur1PeutJouer = true;
 		boolean joueur2PeutJouer = true;
@@ -841,7 +765,7 @@ public class jeu {
 
 			switch (menuEnJeu) {
 			case "save":
-				sauvegarde();
+				int[][] plateauASauvegarder = sauvegarde();
 				break;
 			case "help":
 				aide(1);
@@ -902,7 +826,6 @@ public class jeu {
 	}
 
 
-	
 	/************************ Partie 4 ************************/
 	
 
@@ -912,7 +835,7 @@ public class jeu {
 	public static void main(String[] args) {
 		sc = new Scanner(System.in);
 
-		init(6, false);
+		init(14, false);
 
 		jeuBoucle(false);
 

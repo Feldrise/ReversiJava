@@ -742,7 +742,9 @@ public class jeu {
 	 * 
 	 * @param regle la règle avec laquelle on joue
 	 */
-	public static void jeuBoucle(boolean regle) {
+	public static void jeuBoucle(boolean regle) {		
+		init(14, regle);
+
 		boolean joueur1PeutJouer = true;
 		boolean joueur2PeutJouer = true;
 
@@ -766,6 +768,7 @@ public class jeu {
 			switch (menuEnJeu) {
 			case "save":
 				int[][] plateauASauvegarder = sauvegarde();
+				// TODO: save in a file
 				break;
 			case "help":
 				aide(1);
@@ -825,7 +828,39 @@ public class jeu {
 		}
 	}
 
+	/**
+	 * Affiche le menu du jeu
+	 */
+	public static void menu() {
+		System.out.println("REVERSI ======");
+		System.out.println("Bienvenue dans le jeu de reversi. Que voulez vous faire ?");
+		System.out.println("");
+		System.out.println("1) Jouer");
+		System.out.println("2) Charger la dernière partie sauvegardé");
+		System.out.println("3) Quitter");
 
+		int choix = sc.nextInt();
+
+		switch (choix) {
+		case 1:
+			ecranSuivant();
+			System.out.println("Voulez vous jouer la règles classique ? (Y/n)");
+			
+			sc.nextLine();
+			String regleChoisi = sc.nextLine().toLowerCase();
+			
+			if (regleChoisi.contains("n"))
+				jeuBoucle(true);
+			else 
+				jeuBoucle(false);
+			break;
+		case 2:
+			// TODO : on charge la partie sauvegardé
+			break;
+		default:
+			break;
+		}
+	}
 	/************************ Partie 4 ************************/
 	
 
@@ -835,9 +870,7 @@ public class jeu {
 	public static void main(String[] args) {
 		sc = new Scanner(System.in);
 
-		init(14, false);
-
-		jeuBoucle(false);
+		menu();
 
 		// // 0 0 0 0 0 0 
 		// // 0 0 - X 0 0   

@@ -1,3 +1,9 @@
+/// TP Reversi Projet INF1
+/// 
+/// Victor DENIS et Antonia PROCESI
+/// https://github.com/Feldrise/ReversiJava
+
+
 package reversi;
 
 import java.util.*;

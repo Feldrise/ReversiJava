@@ -54,6 +54,7 @@ public class jeu {
 	public static int[][] plateau; // Contient les pions
 	public static boolean passe; // Indique si le joueur précédent à passé son tour.
 
+	public static int ia = 0; // Indique contre quelle IA le joueur joue. 0 = pas d'IA
 
 	/**
 	 * Vérifie qu'un tableau d'entier contient un numéro
@@ -90,6 +91,12 @@ public class jeu {
 		return score;
 	}
 
+	/**
+	 * Permet d'obtenir le numéro correspondant à une lettre
+	 * @param lettre la lettre dont on veut obtenir le numéro
+	 * 
+	 * @return le numéro attendu
+	 */
 	public static int lettreVersNombre(char lettre) {
 		return (int)(lettre) - 65;
 	}
@@ -109,6 +116,22 @@ public class jeu {
 			if (current == 2)
 				plateau[conversion1DLigne(numeros[i])][conversion1DColonne(numeros[i])] = 1;
 		}
+	}
+
+	/**
+	 * Permet d'obtenir un entier aléatoire dans un intervalle
+	 * 
+	 * @param min le minimum de l'intervalle
+	 * @param max le maximum de l'intervalle
+	 * @return un entier aléatoire dans l'intervale [min, max]
+	 */
+	public static int entierDansIntervalle(int min, int max) {
+		if (min >= max) {
+			throw new IllegalArgumentException("max must be greater than min");
+		}
+
+		Random r = new Random();
+		return r.nextInt((max - min) + 1) + min;
 	}
 
 	/************************ Partie 1 ************************/
@@ -707,10 +730,27 @@ public class jeu {
 	/**
 	 * Permet de voir les coups possibles pour un joueur
 	 * 
-	 * @param version ? 
+	 * @param version permet de choisir d'afficher un coup qu'une IA aurait joué
 	 */
 	public static void aide(int version) {
-		affiche(possibleCoups());
+		int[] coupIA = new int[1];
+		switch (version) {
+		case 1:
+			coupIA[0] = premierIA(false);
+			affiche(coupIA);	
+			break;
+		case 2:
+			coupIA[0] = secondeIA(false);
+			affiche(coupIA);
+			break;
+		case 3:
+			coupIA[0] = troisiemeIA(false);
+			affiche(coupIA);
+			break;
+		default:
+			affiche(possibleCoups());
+			break;
+		}
 	}
 
 	/************************ Partie 3 ************************/
@@ -761,17 +801,24 @@ public class jeu {
 			System.out.println();
 			score();
 			
-			// On affiche le menu de sauvegarde
-			String menuEnJeu = menuEnJeu();
-			// sc.nextLine(); // Fix pour ne pas avoir de nextLine ignoré
+			String menuEnJeu = "";
 
+			// On affiche le menu de sauvegarde
+			if (ia == 0 || joueur == 1) 
+				menuEnJeu = menuEnJeu();
+			else 
+				menuEnJeu = "none";
+
+			// sc.nextLine(); // Fix pour ne pas avoir de nextLine ignoré
 			switch (menuEnJeu) {
 			case "save":
 				int[][] plateauASauvegarder = sauvegarde();
 				// TODO: save in a file
 				break;
 			case "help":
-				aide(1);
+				System.out.println("Quelle version de l'aider voulez vous ? (0/1/2/3)");
+				aide(sc.nextInt());
+				sc.nextLine();
 				break;
 			case "exit":
 				return;
@@ -798,7 +845,7 @@ public class jeu {
 			}
 
 			// La, on est sur que le joueur peut jouer
-			if (regle) {
+			if (regle && !(joueur == 2 && ia != 0)) {
 				System.out.println("Voulez vous passer votre tour (Y/n) ?");
 				String reponse = sc.nextLine();
 				
@@ -810,6 +857,12 @@ public class jeu {
 					
 					continue;
 				}
+			}
+
+			if (joueur == 2 && ia != 0) {
+				playIA();
+				joueur = 1;
+				continue;
 			}
 
 			System.out.println("Veuillez indiquer la case que vous voulez jouer");
@@ -840,15 +893,24 @@ public class jeu {
 		System.out.println("3) Quitter");
 
 		int choix = sc.nextInt();
+		sc.nextLine();
 
 		switch (choix) {
 		case 1:
 			ecranSuivant();
 			System.out.println("Voulez vous jouer la règles classique ? (Y/n)");
 			
-			sc.nextLine();
 			String regleChoisi = sc.nextLine().toLowerCase();
 			
+			System.out.println("Voulez vous jouer contre une IA ?");
+			System.out.println("1) Non");
+			System.out.println("2) IA niveau 1");
+			System.out.println("3) IA niveau 2");
+			System.out.println("4) IA niveau 3");
+
+			ia = sc.nextInt() - 1;
+			sc.nextLine();
+
 			if (regleChoisi.contains("n"))
 				jeuBoucle(true);
 			else 
@@ -862,9 +924,60 @@ public class jeu {
 		}
 	}
 	/************************ Partie 4 ************************/
-	
+	/**
+	 * Cette fonction joue l'IA en fonction de la difficulté choisi par le joueur
+	 */
+	public static void playIA() {
+		switch (ia) {
+		case 1:
+			premierIA(true);
+			break;
+		case 2:
+			secondeIA(true);
+			break;
+		case 3:
+			troisiemeIA(true);
+			break;
+		default:
+			premierIA(true);
+			break;
+		}
+	}
 
+	/**
+	 * Joue la première IA qui choisi un coup au hasard parmis les coups possibles
+	 * 
+	 * @param play faire jouer l'IA ou simplement retourner le coup qu'elle aurait joué
+	 */
+	public static int premierIA(boolean play) {
+		int[] coupsPossibles = possibleCoups();
+		int coupChoisi = entierDansIntervalle(0, possibleCoups().length - 1);
 
+		if (play)
+			joueCoup(coupsPossibles[coupChoisi]);
+
+		return coupsPossibles[coupChoisi];
+	}
+
+	/**
+	 * Joue la seconde IA qui joue la où il y a le plus de pions retourné possible
+	 * 
+	 * @param play faire jouer l'IA ou simplement retourner le coup qu'elle aurait joué
+	 */
+	public static int secondeIA(boolean play) {
+		// TODO: faire
+		return premierIA(play);
+	}
+
+	/**
+	 * Joue la troisième IA
+	 * 
+	 * @param play faire jouer l'IA ou simplement retourner le coup qu'elle aurait joué
+	 */
+	public static int troisiemeIA(boolean play) {
+		// TODO: faire
+		return premierIA(play);
+	}
 	
 	/*************************** main ***************************/
 	public static void main(String[] args) {

@@ -930,6 +930,65 @@ public class jeu {
 		}
 	}
 	/************************ Partie 4 ************************/
+
+	/**
+	 * Permet de savoir combien de pion seront retourné dans une direction données en comptant les pions déjà retournés
+	 * 
+	 * @param casesRetournes Les pions déjà retournés
+	 * @param offset Où on en est dans le tableau des cases retournées
+	 * @param coupDansDirection Tous les pions retournés dans une direction
+	 * 
+	 * @return le nombre de pion effectivement retournés
+	 */
+	public static int nbreCasesRetournesDir(int[] casesRetournes, int offset, int[] coupDansDirection) {
+		int result = 0;
+
+		for (int i = 0; i < coupDansDirection.length; ++i) {
+			if (!tableauContient(casesRetournes, coupDansDirection[i])) {
+				casesRetournes[offset] = coupDansDirection[i];
+				++offset;
+				++result;
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Permet de simuler un coup
+	 * 
+	 * @param numero numéro de la case joué
+	 * @return le nombre de cases retournées par le coup
+	 */
+	public static int simulerCoup(int numero) {
+		if (!tableauContient(possibleCoups(), numero))
+			return 0;
+
+		int[] coupsNordsOuest = retourneDir(joueur, numero, "NO");
+		int[] coupsNords = retourneDir(joueur, numero, "N");
+		int[] coupsNordsEst = retourneDir(joueur, numero, "NE");
+		int[] coupsOuest = retourneDir(joueur, numero, "O");
+		int[] coupsEst = retourneDir(joueur, numero, "E");
+		int[] coupsSudOuest = retourneDir(joueur, numero, "SO");
+		int[] coupsSud = retourneDir(joueur, numero, "S");
+		int[] coupsSudEst = retourneDir(joueur, numero, "SE");
+
+		int[] casesRetournes = new int[taille * taille];
+		int indexOffset = 0;
+		int result = 0;
+
+		result += nbreCasesRetournesDir(casesRetournes, indexOffset, coupsNordsOuest);
+		result += nbreCasesRetournesDir(casesRetournes, indexOffset, coupsNords);
+		result += nbreCasesRetournesDir(casesRetournes, indexOffset, coupsNordsEst);
+		result += nbreCasesRetournesDir(casesRetournes, indexOffset, coupsOuest);
+		result += nbreCasesRetournesDir(casesRetournes, indexOffset, coupsEst);
+		result += nbreCasesRetournesDir(casesRetournes, indexOffset, coupsSudOuest);
+		result += nbreCasesRetournesDir(casesRetournes, indexOffset, coupsSud);
+		result += nbreCasesRetournesDir(casesRetournes, indexOffset, coupsSudEst);
+
+		return result;
+	}
+
 	/**
 	 * Cette fonction joue l'IA en fonction de la difficulté choisi par le joueur
 	 */
@@ -971,8 +1030,22 @@ public class jeu {
 	 * @param play faire jouer l'IA ou simplement retourner le coup qu'elle aurait joué
 	 */
 	public static int secondeIA(boolean play) {
-		// TODO: faire
-		return premierIA(play);
+		int[] coupsPossibles = possibleCoups();
+		int max = 0;
+		int numeroAuMax = 0;
+
+		for (int i = 0; i < coupsPossibles.length; ++i) {
+			int nombrePionsRetournes = simulerCoup(coupsPossibles[i]); 
+			if (max < nombrePionsRetournes) {
+				max = nombrePionsRetournes;
+				numeroAuMax = coupsPossibles[i];
+			}
+		}
+
+		if (play)
+			joueCoup(numeroAuMax);
+
+		return numeroAuMax;
 	}
 
 	/**
